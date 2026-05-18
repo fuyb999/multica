@@ -72,7 +72,7 @@ export async function fetchLatestRelease(): Promise<LatestRelease> {
     }
     const data = (await res.json()) as GitHubReleasePayload[];
 
-    // Defensive filter — Multica doesn't publish prereleases or drafts
+    // Defensive filter — AI分析师 doesn't publish prereleases or drafts
     // today, but the endpoint returns them if that ever changes. A
     // prerelease shadowing a stable version on /download would be a
     // regression.

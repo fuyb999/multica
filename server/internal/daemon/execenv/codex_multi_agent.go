@@ -26,7 +26,7 @@ import (
 // The override only touches the per-task `CODEX_HOME/config.toml`; the
 // user's global `~/.codex/config.toml` is never modified.
 //
-// Users who explicitly want Codex native subagents inside a Multica task
+// Users who explicitly want Codex native subagents inside a AI分析师 task
 // (and accept the lifecycle risk) can keep the feature enabled by setting
 // `MULTICA_CODEX_MULTI_AGENT=1` in the daemon environment.
 //

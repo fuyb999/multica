@@ -1118,7 +1118,7 @@ func TestGetRemoteDefaultBranchUsesBareHeadHintForCustomDefault(t *testing.T) {
 
 // TestCreateWorktreeInstallsCoAuthoredByHook verifies that CreateWorktree
 // installs a prepare-commit-msg hook that appends a Co-authored-by trailer
-// for the Multica Agent to every commit made in the worktree.
+// for the AI分析师 Agent to every commit made in the worktree.
 func TestCreateWorktreeInstallsCoAuthoredByHook(t *testing.T) {
 	t.Parallel()
 	sourceRepo := createTestRepo(t)
@@ -1208,7 +1208,7 @@ func TestCoAuthoredByHookIdempotent(t *testing.T) {
 }
 
 // TestCreateWorktreeRemovesCoAuthoredByHookWhenDisabled verifies the toggle-off
-// path: a bare cache that already carries the Multica prepare-commit-msg hook
+// path: a bare cache that already carries the AI分析师 prepare-commit-msg hook
 // (e.g. from a prior worktree created with the setting on) must drop the hook
 // when the next CreateWorktree call passes CoAuthoredByEnabled=false.
 // Otherwise commits keep getting the trailer even after the user disables the
@@ -1282,7 +1282,7 @@ func TestCreateWorktreeRemovesCoAuthoredByHookWhenDisabled(t *testing.T) {
 // TestCreateWorktreeRemovesLegacyCoAuthoredByHook verifies the migration
 // path: bare clones already on disk from previous daemon versions carry a
 // prepare-commit-msg hook that does NOT include the multicaHookMarker
-// sentinel — only the older `# Installed by the Multica daemon.` comment.
+// sentinel — only the older `# Installed by the AI分析师 daemon.` comment.
 // Toggling the workspace setting off must still remove those legacy hooks,
 // otherwise users who flip the toggle in production keep seeing the trailer
 // indefinitely (the exact bug reported in MUL-1704).
@@ -1301,8 +1301,8 @@ func TestCreateWorktreeRemovesLegacyCoAuthoredByHook(t *testing.T) {
 	// verbatim copy here means the test fails if recognition logic ever
 	// drifts away from what production hosts actually have on disk.
 	const legacyHook = `#!/bin/sh
-# Multica: add Co-authored-by trailer for the Multica Agent.
-# Installed by the Multica daemon. Do not edit — it will be overwritten.
+# AI分析师: add Co-authored-by trailer for the AI分析师 Agent.
+# Installed by the AI分析师 daemon. Do not edit — it will be overwritten.
 
 COMMIT_MSG_FILE="$1"
 COMMIT_SOURCE="$2"
@@ -1385,7 +1385,7 @@ func TestRemoveCoAuthoredByHookPreservesUserHook(t *testing.T) {
 		t.Fatalf("create hooks dir: %v", err)
 	}
 	hookPath := filepath.Join(hooksDir, "prepare-commit-msg")
-	userHook := "#!/bin/sh\n# user hook, not Multica\nexit 0\n"
+	userHook := "#!/bin/sh\n# user hook, not AI分析师\nexit 0\n"
 	if err := os.WriteFile(hookPath, []byte(userHook), 0o755); err != nil {
 		t.Fatalf("seed user hook: %v", err)
 	}

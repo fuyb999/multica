@@ -57,8 +57,8 @@ type GitHubPullRequestResponse struct {
 }
 
 type GitHubConnectResponse struct {
-	URL       string `json:"url"`
-	Configured bool  `json:"configured"`
+	URL        string `json:"url"`
+	Configured bool   `json:"configured"`
 }
 
 func githubInstallationToResponse(i db.GithubInstallation) GitHubInstallationResponse {
@@ -218,7 +218,7 @@ func (h *Handler) GitHubSetupCallback(w http.ResponseWriter, r *http.Request) {
 
 	// Best-effort capture of the connecting user (may be nil if the public
 	// callback was hit without a session — e.g. user wasn't logged in to
-	// Multica when they finished the GitHub install). Either way we save
+	// AI分析师 when they finished the GitHub install). Either way we save
 	// the row so the workspace owner sees the connection on next reload.
 	connectedBy := pgtype.UUID{}
 	if userID := requestUserID(r); userID != "" {
@@ -532,21 +532,21 @@ func (h *Handler) handlePullRequestEvent(ctx context.Context, body []byte) {
 
 	state := derivePRState(p.PullRequest.State, p.PullRequest.Draft, p.PullRequest.Merged)
 	pr, err := h.Queries.UpsertGitHubPullRequest(ctx, db.UpsertGitHubPullRequestParams{
-		WorkspaceID:      inst.WorkspaceID,
-		InstallationID:   inst.InstallationID,
-		RepoOwner:        p.Repository.Owner.Login,
-		RepoName:         p.Repository.Name,
-		PrNumber:         p.PullRequest.Number,
-		Title:            p.PullRequest.Title,
-		State:            state,
-		HtmlUrl:          p.PullRequest.HTMLURL,
-		Branch:           ptrToText(strPtrOrNil(p.PullRequest.Head.Ref)),
-		AuthorLogin:      ptrToText(strPtrOrNil(p.PullRequest.User.Login)),
-		AuthorAvatarUrl:  ptrToText(strPtrOrNil(p.PullRequest.User.AvatarURL)),
-		MergedAt:         parseGHTime(p.PullRequest.MergedAt),
-		ClosedAt:         parseGHTime(p.PullRequest.ClosedAt),
-		PrCreatedAt:      parseGHTimeRequired(p.PullRequest.CreatedAt),
-		PrUpdatedAt:      parseGHTimeRequired(p.PullRequest.UpdatedAt),
+		WorkspaceID:     inst.WorkspaceID,
+		InstallationID:  inst.InstallationID,
+		RepoOwner:       p.Repository.Owner.Login,
+		RepoName:        p.Repository.Name,
+		PrNumber:        p.PullRequest.Number,
+		Title:           p.PullRequest.Title,
+		State:           state,
+		HtmlUrl:         p.PullRequest.HTMLURL,
+		Branch:          ptrToText(strPtrOrNil(p.PullRequest.Head.Ref)),
+		AuthorLogin:     ptrToText(strPtrOrNil(p.PullRequest.User.Login)),
+		AuthorAvatarUrl: ptrToText(strPtrOrNil(p.PullRequest.User.AvatarURL)),
+		MergedAt:        parseGHTime(p.PullRequest.MergedAt),
+		ClosedAt:        parseGHTime(p.PullRequest.ClosedAt),
+		PrCreatedAt:     parseGHTimeRequired(p.PullRequest.CreatedAt),
+		PrUpdatedAt:     parseGHTimeRequired(p.PullRequest.UpdatedAt),
 	})
 	if err != nil {
 		slog.Warn("github: upsert pr failed", "err", err)
@@ -568,10 +568,10 @@ func (h *Handler) handlePullRequestEvent(ctx context.Context, body []byte) {
 			continue
 		}
 		if err := h.Queries.LinkIssueToPullRequest(ctx, db.LinkIssueToPullRequestParams{
-			IssueID:        issue.ID,
-			PullRequestID:  pr.ID,
-			LinkedByType:   strToText("system"),
-			LinkedByID:     pgtype.UUID{},
+			IssueID:       issue.ID,
+			PullRequestID: pr.ID,
+			LinkedByType:  strToText("system"),
+			LinkedByID:    pgtype.UUID{},
 		}); err != nil {
 			slog.Warn("github: link failed", "err", err)
 			continue
@@ -606,7 +606,7 @@ func (h *Handler) handlePullRequestEvent(ctx context.Context, body []byte) {
 	// Broadcast PR change to the workspace so any open issue detail page
 	// re-queries its PR list.
 	h.publish(protocol.EventPullRequestUpdated, workspaceID, "system", "", map[string]any{
-		"pull_request": resp,
+		"pull_request":     resp,
 		"linked_issue_ids": linkedIssueIDs,
 	})
 }

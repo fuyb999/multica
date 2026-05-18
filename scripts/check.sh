@@ -74,6 +74,24 @@ wait_for_port() {
   echo "    $name ready (${elapsed}s)"
 }
 
+ensure_backend_started() {
+  if curl -sf "http://localhost:${PORT}/health" > /dev/null 2>&1; then
+    return
+  fi
+  (cd server && go run ./cmd/server) >/tmp/multica-check-backend.log 2>&1 &
+  BACKEND_PID=$!
+  STARTED_BACKEND=true
+}
+
+ensure_frontend_started() {
+  if curl -sf "http://localhost:${FRONTEND_PORT}" > /dev/null 2>&1; then
+    return
+  fi
+  pnpm dev:web >/tmp/multica-check-frontend.log 2>&1 &
+  FRONTEND_PID=$!
+  STARTED_FRONTEND=true
+}
+
 # --------------------------------------------------------------------------
 # Step 0: Ensure DB
 # --------------------------------------------------------------------------
@@ -114,9 +132,7 @@ if curl -sf "http://localhost:${PORT}/health" > /dev/null 2>&1; then
   echo "    Backend already running on :$PORT"
 else
   echo "    Starting backend..."
-  (cd server && go run ./cmd/server) > /tmp/multica-check-backend.log 2>&1 &
-  BACKEND_PID=$!
-  STARTED_BACKEND=true
+  ensure_backend_started
   wait_for_port "$PORT" "Backend" 90 "/health"
 fi
 
@@ -124,9 +140,7 @@ if curl -sf "http://localhost:${FRONTEND_PORT}" > /dev/null 2>&1; then
   echo "    Frontend already running on :$FRONTEND_PORT"
 else
   echo "    Starting frontend..."
-  pnpm dev:web > /tmp/multica-check-frontend.log 2>&1 &
-  FRONTEND_PID=$!
-  STARTED_FRONTEND=true
+  ensure_frontend_started
   wait_for_port "$FRONTEND_PORT" "Frontend" 120 "/"
 fi
 

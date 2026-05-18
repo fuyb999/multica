@@ -1,6 +1,6 @@
-# Multica Design System
+# AI分析师 Design System
 
-本文档定义 Multica 的视觉语言和交互规范。所有 UI 开发以此为准。
+本文档定义 AI分析师 的视觉语言和交互规范。所有 UI 开发以此为准。
 
 ---
 

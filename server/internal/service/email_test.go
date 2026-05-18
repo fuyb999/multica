@@ -37,10 +37,10 @@ func TestSanitizeSubjectField(t *testing.T) {
 
 func TestBuildInvitationParams_EscapesHTMLInBody(t *testing.T) {
 	tests := []struct {
-		name        string
-		inviter     string
-		workspace   string
-		wantInBody  []string
+		name          string
+		inviter       string
+		workspace     string
+		wantInBody    []string
 		wantNotInBody []string
 	}{
 		{
@@ -119,7 +119,7 @@ func TestBuildInvitationParams_SubjectStripsControls(t *testing.T) {
 	if strings.ContainsAny(p.Subject, "\r\n\t") {
 		t.Errorf("subject still contains control characters: %q", p.Subject)
 	}
-	if p.Subject != "Alice invited you to Acme on Multica" {
+	if p.Subject != "Alice invited you to Acme on AI分析师" {
 		t.Errorf("unexpected subject: %q", p.Subject)
 	}
 }
@@ -150,9 +150,9 @@ func TestBuildInvitationParams_SubjectTruncated(t *testing.T) {
 		longWorkspace,
 		"https://app.multica.ai/invite/abc",
 	)
-	// Template: "Alice invited you to <ws> on Multica"
+	// Template: "Alice invited you to <ws> on AI分析师"
 	// ws is capped at maxSubjectFieldRunes; overall subject should also be bounded.
-	maxExpected := len("Alice invited you to  on Multica") + maxSubjectFieldRunes
+	maxExpected := len("Alice invited you to  on AI分析师") + maxSubjectFieldRunes
 	if runes := len([]rune(p.Subject)); runes > maxExpected {
 		t.Errorf("subject not bounded: %d runes, max %d: %q", runes, maxExpected, p.Subject)
 	}

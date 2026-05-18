@@ -31,10 +31,10 @@ describe("resolvePostAuthDestination", () => {
     );
   });
 
-  it("onboarded + has workspace → /<first.slug>/issues", () => {
+  it("onboarded + has workspace → /<first.slug>/expert-inspiration", () => {
     const ws = [makeWs("acme"), makeWs("beta")];
     expect(resolvePostAuthDestination(ws, true)).toBe(
-      paths.workspace("acme").issues(),
+      paths.workspace("acme").expertInspiration(),
     );
   });
 

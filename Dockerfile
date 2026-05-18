@@ -20,9 +20,16 @@ RUN cd server && CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=${VERSIO
 RUN cd server && CGO_ENABLED=0 go build -ldflags "-s -w" -o bin/migrate ./cmd/migrate
 
 # --- Runtime stage ---
-FROM alpine:3.21
+FROM node:22-bookworm-slim
 
-RUN apk add --no-cache ca-certificates tzdata
+ARG CLAUDE_CODE_VERSION=latest
+ARG CODEX_VERSION=latest
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates tzdata bash git openssh-client \
+    && npm install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}" "@openai/codex@${CODEX_VERSION}" \
+    && npm cache clean --force \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

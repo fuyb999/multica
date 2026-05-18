@@ -1,6 +1,6 @@
 # Self-Hosting Guide
 
-Deploy Multica on your own infrastructure in minutes.
+Deploy AI分析师 on your own infrastructure in minutes.
 
 ## Architecture
 
@@ -9,8 +9,9 @@ Deploy Multica on your own infrastructure in minutes.
 | **Backend** | REST API + WebSocket server | Go (single binary) |
 | **Frontend** | Web application | Next.js 16 |
 | **Database** | Primary data store | PostgreSQL 17 with pgvector |
+| **Agent daemon** | Optional containerized local runtime with Claude Code and Codex preinstalled | `multica daemon` |
 
-Each user who runs AI agents locally also installs the **`multica` CLI** and runs the **agent daemon** on their own machine.
+Each user who runs AI agents can either install the **`multica` CLI** and run the **agent daemon** on their own machine, or start the optional Docker daemon container after logging in with the CLI.
 
 ## Quick Install (Recommended)
 
@@ -24,7 +25,7 @@ curl -fsSL https://raw.githubusercontent.com/multica-ai/multica/main/scripts/ins
 multica setup self-host
 ```
 
-This installs the `multica` CLI, checks out the latest self-host assets, pulls the official Multica images from GHCR, and configures everything for localhost.
+This installs the `multica` CLI, checks out the latest self-host assets, pulls the official AI分析师 images from GHCR, and configures everything for localhost.
 
 Open http://localhost:3000. To log in, configure `RESEND_API_KEY` in `.env` for email-based codes (recommended), or leave Resend unset and copy the generated code from the backend logs. See [Step 2 — Log In](#step-2--log-in) for details.
 
@@ -79,7 +80,7 @@ Changes to `ALLOW_SIGNUP` and `GOOGLE_CLIENT_ID` also take effect after restarti
 
 ### Step 3 — Install CLI & Start Daemon
 
-The daemon runs on your local machine (not inside Docker). It detects installed AI agent CLIs, registers them with the server, and executes tasks when agents are assigned work.
+The daemon detects installed AI agent CLIs, registers them with the server, and executes tasks when agents are assigned work. You can run it on your host machine, or run the optional Docker daemon container that ships with Claude Code and Codex preinstalled.
 
 Each team member who wants to run AI agents locally needs to:
 
@@ -120,20 +121,46 @@ For on-premise deployments with custom domains:
 multica setup self-host --server-url https://api.example.com --app-url https://app.example.com
 ```
 
-To verify the daemon is running:
+### c) Optional: run the daemon in Docker
+
+The self-host backend image also contains the `multica` CLI plus the `claude` and `codex` CLIs. After `multica setup self-host` has created `~/.multica/config.json`, you can run the daemon inside Docker instead of on the host:
+
+```bash
+multica daemon stop
+
+docker compose -f docker-compose.selfhost.yml --profile daemon up -d agent-daemon
+```
+
+The `agent-daemon` service mounts:
+
+- `${MULTICA_CLI_CONFIG_DIR:-~/.multica}` → `/home/multica/.multica` for the AI分析师 login token
+- `${CLAUDE_CONFIG_DIR:-~/.claude}` → `/home/multica/.claude:ro` for Claude Code auth/config
+- `${CODEX_CONFIG_DIR:-~/.codex}` → `/home/multica/.codex:ro` for Codex auth/config
+- `${MULTICA_WORKSPACES_DIR:-multica_agent_workspaces}` → `/home/multica/workspaces` for task checkouts
+
+Override those paths in `.env` if your CLI config lives elsewhere. The container connects to the backend over the Compose network using `MULTICA_SERVER_URL=http://backend:8080`.
+
+
+To verify a host daemon is running:
 
 ```bash
 multica daemon status
 ```
 
-> **Alternative:** If you prefer manual steps, see [Manual CLI Configuration](#manual-cli-configuration) below.
+To verify the Docker daemon is running:
+
+```bash
+docker compose -f docker-compose.selfhost.yml --profile daemon logs -f agent-daemon
+```
 
 ### Step 4 — Verify & Start Using
 
 1. Open your workspace in the web app at http://localhost:3000
-2. Navigate to **Settings → Runtimes** — you should see your machine listed
-3. Go to **Settings → Agents** and create a new agent
+2. Navigate to **Settings → Runtimes** — you should see your host machine or Docker Agent listed
+3. Go to **Settings → Agents** and create a new agent backed by one of the detected runtimes
 4. Create an issue and assign it to your agent — it will pick up the task automatically
+
+> **Alternative:** If you prefer manual steps, see [Manual CLI Configuration](#manual-cli-configuration) below.
 
 ## Stopping Services
 
@@ -153,9 +180,9 @@ make selfhost-stop
 multica daemon stop
 ```
 
-## Switching to Multica Cloud
+## Switching to AI分析师 Cloud
 
-If you've been self-hosting and want to switch your CLI to [Multica Cloud](https://multica.ai):
+If you've been self-hosting and want to switch your CLI to [AI分析师 Cloud](https://multica.ai):
 
 ```bash
 multica setup

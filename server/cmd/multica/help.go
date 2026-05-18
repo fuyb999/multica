@@ -35,7 +35,6 @@ func exactArgs(n int) cobra.PositionalArgs {
 	}
 }
 
-
 // initHelp configures the root command to use gh-style help output.
 func initHelp(root *cobra.Command) {
 	root.SetHelpTemplate(rootHelpTemplate)
@@ -108,7 +107,7 @@ func init() {
 	})
 }
 
-var rootHelpTemplate = `Work seamlessly with Multica from the command line.
+var rootHelpTemplate = `Work seamlessly with AI分析师 from the command line.
 
 USAGE
   multica <command> <subcommand> [flags]

@@ -11,8 +11,17 @@ export const workspaceKeys = {
   agents: (wsId: string) => ["workspaces", wsId, "agents"] as const,
   squads: (wsId: string) => ["workspaces", wsId, "squads"] as const,
   skills: (wsId: string) => ["workspaces", wsId, "skills"] as const,
+  expertInspiration: (wsId: string) => ["workspaces", wsId, "expert-inspiration"] as const,
   assigneeFrequency: (wsId: string) => ["workspaces", wsId, "assignee-frequency"] as const,
 };
+
+export function expertInspirationSessionOptions(wsId: string) {
+  return queryOptions({
+    queryKey: workspaceKeys.expertInspiration(wsId),
+    queryFn: () => api.listExpertInspirationSessions(wsId),
+    enabled: !!wsId,
+  });
+}
 
 export function workspaceListOptions() {
   return queryOptions({

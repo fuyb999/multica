@@ -1,12 +1,12 @@
 # Self-Hosting Setup (for AI Agents)
 
-This document is designed for AI agents to execute. Follow these steps exactly to deploy a local Multica instance and connect to it.
+This document is designed for AI agents to execute. Follow these steps exactly to deploy a local AI分析师 instance and connect to it.
 
 ## Prerequisites
 
 - Docker and Docker Compose installed
-- Homebrew installed (for CLI)
-- At least one AI agent CLI on PATH: `claude` or `codex`
+- Homebrew installed (for host CLI setup)
+- At least one AI agent CLI on PATH for a host daemon, or use the optional Docker daemon with Claude Code and Codex preinstalled
 
 ## Install
 
@@ -18,7 +18,7 @@ curl -fsSL https://raw.githubusercontent.com/multica-ai/multica/main/scripts/ins
 multica setup self-host
 ```
 
-Wait for the server output `✓ Multica server is running and CLI is ready!` before running `multica setup self-host`.
+Wait for the server output `✓ AI分析师 server is running and CLI is ready!` before running `multica setup self-host`.
 
 **Expected result:**
 - Frontend at http://localhost:3000
@@ -48,6 +48,24 @@ multica daemon status
 ```
 
 Should show `running` with detected agents.
+
+## Optional: Docker Agent Daemon
+
+If the host does not have `claude` or `codex` on PATH, authenticate the CLI first, then run the daemon container. The backend image includes the `multica` CLI plus Claude Code and Codex preinstalled.
+
+```bash
+multica daemon stop
+
+docker compose -f docker-compose.selfhost.yml --profile daemon up -d agent-daemon
+```
+
+The daemon container reads the AI分析师 token from `${MULTICA_CLI_CONFIG_DIR:-~/.multica}` and mounts `${CLAUDE_CONFIG_DIR:-~/.claude}` / `${CODEX_CONFIG_DIR:-~/.codex}` read-only for agent CLI auth. Override those paths in `.env` when the host config directories live elsewhere.
+
+To verify the Docker daemon:
+
+```bash
+docker compose -f docker-compose.selfhost.yml --profile daemon logs -f agent-daemon
+```
 
 ## Stopping
 

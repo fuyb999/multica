@@ -44,7 +44,7 @@ function mergeQuestionnaire(
 
 /**
  * Shell's onComplete contract:
- *   onComplete(workspace?) — if present, navigate into its issues list;
+ *   onComplete(workspace?) — if present, navigate into its expert inspiration page;
  *   if omitted, fall back to root. A Starter-content opt-in dialog runs
  *   on the issues page itself (see `StarterContentPrompt`), so the flow
  *   doesn't carry `firstIssueId` any more — there is no welcome issue
@@ -181,7 +181,7 @@ export function OnboardingFlow({
   }, []);
 
   // Step 5 fired `completeOnboarding` itself. Here we just route the
-  // user to their workspace — the starter-content decision happens
+  // user to their workspace's default landing page — the starter-content decision happens
   // inside the workspace via the `StarterContentPrompt` dialog.
   const handleFinished = useCallback(() => {
     onComplete(workspace ?? undefined);

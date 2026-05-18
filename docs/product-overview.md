@@ -1,13 +1,13 @@
-# Multica 产品全景文档
+# AI分析师 产品全景文档
 
 > **文档说明**
 >
-> 这份文档的目的是：**让任何没有写过代码的新同事，在 30 分钟内完全理解 Multica 这个产品到底有哪些功能、每个功能在整体中处于什么位置、一个功能和另一个功能如何协同**。
+> 这份文档的目的是：**让任何没有写过代码的新同事，在 30 分钟内完全理解 AI分析师 这个产品到底有哪些功能、每个功能在整体中处于什么位置、一个功能和另一个功能如何协同**。
 >
 > 它的受众包括：
 >
 > - **新加入的工程师 / 产品 / 设计 / 运营**——用它做 onboarding 的第一份材料
-> - **产品介绍工作**——需要对外讲解 Multica 时的事实基础
+> - **产品介绍工作**——需要对外讲解 AI分析师 时的事实基础
 > - **文案工作者**——写交互文案、营销文案、帮助文档时，需要知道某个词（比如 "Skill"、"Runtime"、"Autopilot"）在产品体系里代表什么
 > - **任何需要在修改某个局部前，先理解它与整体关系的人**
 >
@@ -19,7 +19,7 @@
 
 ## 目录
 
-1. [Multica 是什么](#1-multica-是什么)
+1. [AI分析师 是什么](#1-multica-是什么)
 2. [核心概念词典](#2-核心概念词典)
 3. [功能全景（按模块）](#3-功能全景按模块)
    - 3.1 [Workspace 工作区](#31-workspace-工作区)
@@ -43,11 +43,11 @@
 
 ---
 
-## 1. Multica 是什么
+## 1. AI分析师 是什么
 
 ### 一句话定位
 
-**Multica 把编码智能体变成真正的团队成员。**
+**AI分析师 把编码智能体变成真正的团队成员。**
 
 像给同事分配任务一样，把一个 issue 指派给一个 agent，它会自己认领、写代码、汇报进度、更新状态——不需要你一直守着。
 
@@ -60,7 +60,7 @@
 - 没有跨任务的记忆，每次都从零开始
 - 多个 agent 同时工作时，没有一个"看板"能看到全局
 
-Multica 做的事：
+AI分析师 做的事：
 
 - Agent 和人**共用同一个任务看板**（issue board）
 - Agent **有 profile**，会出现在 assignee 下拉里、会在评论区发言、会自己创建 issue
@@ -70,17 +70,17 @@ Multica 做的事：
 
 ### 定位一句话版本
 
-> Multica 不是一个 AI 工具，而是一个**人 + AI 协作的任务管理平台**。agent 是一等公民，和人在同一个工作流里。
+> AI分析师 不是一个 AI 工具，而是一个**人 + AI 协作的任务管理平台**。agent 是一等公民，和人在同一个工作流里。
 
 ### 部署形态
 
-- **云版本（Multica Cloud）**：官方托管服务，agent 通过你本地跑的 daemon 执行
+- **云版本（AI分析师 Cloud）**：官方托管服务，agent 通过你本地跑的 daemon 执行
 - **自托管（Self-Host）**：完整后端可以部署在自己的服务器
 - **客户端**：Next.js web 版 + Electron 桌面版（两端体验基本一致，桌面独有：多标签、原生托盘、自动更新）
 
 ### 支持的 Coding Agent
 
-Multica **不自己训模型**，也不锁定某一家厂商。它是调度器，本地 daemon 会自动探测以下 CLI 工具并接入：
+AI分析师 **不自己训模型**，也不锁定某一家厂商。它是调度器，本地 daemon 会自动探测以下 CLI 工具并接入：
 
 Claude Code · Codex · OpenClaw · OpenCode · Hermes · Gemini · Pi · Cursor Agent · Kimi · Kiro CLI
 
@@ -126,7 +126,7 @@ Claude Code · Codex · OpenClaw · OpenCode · Hermes · Gemini · Pi · Cursor
 
 ### 3.1 Workspace 工作区
 
-> **角色**：一切的容器。Multica 的多租户边界。
+> **角色**：一切的容器。AI分析师 的多租户边界。
 
 #### 功能
 
@@ -150,9 +150,9 @@ Workspace 不是一个功能，而是**所有功能的坐标系**。URL 的形�
 
 ### 3.2 Issue 议题管理
 
-> **角色**：Multica 的核心工作对象。
+> **角色**：AI分析师 的核心工作对象。
 
-Issue 对应的概念在 Linear 叫 Issue、在 Jira 叫 Ticket、在 GitHub 叫 Issue——就是一个任务单元。Multica 的特色在于**issue 可以分配给 agent，和分配给人完全对等**。
+Issue 对应的概念在 Linear 叫 Issue、在 Jira 叫 Ticket、在 GitHub 叫 Issue——就是一个任务单元。AI分析师 的特色在于**issue 可以分配给 agent，和分配给人完全对等**。
 
 #### 核心字段
 
@@ -237,7 +237,7 @@ Project 相比 Issue 是更高层的组织单元。一个 issue 可以不属于�
 
 ### 3.4 Agent 智能体
 
-> **角色**：AI 工作者。Multica 最独特的对象。
+> **角色**：AI 工作者。AI分析师 最独特的对象。
 
 一个 Agent 不是一个"AI 模型"，而是一个**带配置的工作者身份**。它有名字、头像、个人描述、说明书（系统提示词）、绑定的运行时、挂载的技能。在 UI 上它和人一样会出现在 assignee 下拉、评论作者、订阅者列表里。
 
@@ -268,7 +268,7 @@ Project 相比 Issue 是更高层的组织单元。一个 issue 可以不属于�
 
 #### 产品里的位置
 
-Agent 是 Multica 的灵魂。几乎所有功能都围绕"如何让一个 agent 干活"展开：
+Agent 是 AI分析师 的灵魂。几乎所有功能都围绕"如何让一个 agent 干活"展开：
 - Issue 通过分配触发 agent
 - Skill 通过挂载赋能 agent
 - Runtime 提供 agent 的运行环境
@@ -285,7 +285,7 @@ Agent 是 Multica 的灵魂。几乎所有功能都围绕"如何让一个 agent 
 
 > **角色**：Agent 真正跑起来的物理/虚拟机器。
 
-这是 Multica **分布式执行架构**的核心设计：**agent 不在 server 上运行，而在用户自己的机器上运行**。Server 只做任务调度、状态同步、数据存储。
+这是 AI分析师 **分布式执行架构**的核心设计：**agent 不在 server 上运行，而在用户自己的机器上运行**。Server 只做任务调度、状态同步、数据存储。
 
 #### Daemon 是什么
 
@@ -393,7 +393,7 @@ multica skill files upsert <skill-id> --path ...
 
 #### 产品里的位置
 
-Skill 是 Multica 区别于"每次都要写长 prompt"的关键机制。它让团队的专业知识**沉淀成可复用的组件**，绑在 agent 上就生效——就像给员工写的 SOP/playbook。
+Skill 是 AI分析师 区别于"每次都要写长 prompt"的关键机制。它让团队的专业知识**沉淀成可复用的组件**，绑在 agent 上就生效——就像给员工写的 SOP/playbook。
 
 从架构角度：skill 不参与执行逻辑，只参与**上下文注入**。它在整个任务生命周期里只出现一次——在 daemon 启动 CLI 之前的环境准备阶段。
 
@@ -459,7 +459,7 @@ autopilot
 
 #### 产品里的位置
 
-Autopilot 让 Multica 从"你分配 → agent 做"升级到"agent 自己发起工作"。配合 `run_only` 模式，甚至可以在没有 issue 的前提下跑定时任务。Issue 上的 `origin_type=autopilot` + `origin_id` 字段留下了"这个 issue 是哪个 autopilot run 创建的"的追溯链。
+Autopilot 让 AI分析师 从"你分配 → agent 做"升级到"agent 自己发起工作"。配合 `run_only` 模式，甚至可以在没有 issue 的前提下跑定时任务。Issue 上的 `origin_type=autopilot` + `origin_id` 字段留下了"这个 issue 是哪个 autopilot run 创建的"的追溯链。
 
 #### 对应表
 
@@ -581,7 +581,7 @@ Inbox 是"主动注意力系统"，让用户不必一直盯着看板也知道哪
 
 #### 产品里的位置
 
-成员管理是**一切协作的前提**。但在 Multica 里它有一个独特之处：成员系统也管 agent。之所以要有 `assignee_type` 区分 member 和 agent，就是为了让两者在同一套 API 里表达"谁可以被分配"。
+成员管理是**一切协作的前提**。但在 AI分析师 里它有一个独特之处：成员系统也管 agent。之所以要有 `assignee_type` 区分 member 和 agent，就是为了让两者在同一套 API 里表达"谁可以被分配"。
 
 #### 对应表
 
@@ -683,7 +683,7 @@ Onboarding 是新用户能不能成功把 agent 跑起来的关键漏斗。任�
 
 #### 产品里的位置
 
-Settings 是所有"配置即工作"动作的汇总：agent 的 prompt、workspace 的 context、仓库白名单、skill 的内容——都在这里。**对运营和文案来说最重要的一句话**：用户在 Multica 的 settings 页面做的配置，每一项都会影响 agent 实际执行时读到的上下文。
+Settings 是所有"配置即工作"动作的汇总：agent 的 prompt、workspace 的 context、仓库白名单、skill 的内容——都在这里。**对运营和文案来说最重要的一句话**：用户在 AI分析师 的 settings 页面做的配置，每一项都会影响 agent 实际执行时读到的上下文。
 
 ---
 
@@ -728,7 +728,7 @@ multica version | update
 
 #### 产品里的位置
 
-CLI 是 Multica 对开发者友好度的体现。对于 agent 自己来说，也同等重要——**agent 在执行任务时能调用 `multica` 命令读写 issue、评论、查文档**，这正是 CLI 在 "agent 作为一等公民"架构里的作用。
+CLI 是 AI分析师 对开发者友好度的体现。对于 agent 自己来说，也同等重要——**agent 在执行任务时能调用 `multica` 命令读写 issue、评论、查文档**，这正是 CLI 在 "agent 作为一等公民"架构里的作用。
 
 ---
 
@@ -782,7 +782,7 @@ CLI 是 Multica 对开发者友好度的体现。对于 agent 自己来说，也
 | **Web / Desktop 客户端** | UI、本地客户端状态（Zustand）、服务器状态缓存（TanStack Query）、WebSocket 订阅 | 业务规则、AI 调用 |
 | **Server** | 持久化、权限、任务编排、事件广播、Autopilot 调度、Runtime 健康监测 | 不直接执行 agent、不调 LLM |
 | **Daemon** | 探测并启动本地 CLI、管理任务工作目录、流式上报消息、session 恢复 | 不做业务决策、只认 server 给它的任务 |
-| **Agent CLI（Claude Code 等）** | 实际调用 LLM、执行工具调用、写文件、跑测试 | 不感知 Multica 的数据模型（所有上下文通过 `multica` CLI 命令读回） |
+| **Agent CLI（Claude Code 等）** | 实际调用 LLM、执行工具调用、写文件、跑测试 | 不感知 AI分析师 的数据模型（所有上下文通过 `multica` CLI 命令读回） |
 
 ### 实时层（WebSocket）
 
@@ -812,7 +812,7 @@ Server 启动一个 WebSocket hub：
 
 ### AI / LLM 在哪里
 
-**Multica 本身不直接调 LLM API**。所有 LLM 调用都在 agent CLI 子进程里发生（Claude Code 调 Anthropic API、Codex 调 OpenAI API 等）。
+**AI分析师 本身不直接调 LLM API**。所有 LLM 调用都在 agent CLI 子进程里发生（Claude Code 调 Anthropic API、Codex 调 OpenAI API 等）。
 
 Server 和 daemon 做的事情是：
 
@@ -970,7 +970,7 @@ Web 有 URL 栏——错误状态（比如"你没有访问这个 workspace 的�
 
 ## 尾声
 
-Multica 的设计可以归结为一句话：**把"人在一个看板上协作"这件事，扩展到了"人 + AI agent 在同一个看板上协作"**。
+AI分析师 的设计可以归结为一句话：**把"人在一个看板上协作"这件事，扩展到了"人 + AI agent 在同一个看板上协作"**。
 
 所有功能都是围绕这个核心展开：
 - 为了让 agent 能像人一样被分配任务 → polymorphic actor（`assignee_type`）

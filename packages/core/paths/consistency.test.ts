@@ -16,6 +16,7 @@ describe("paths.workspace() shape", () => {
 
     expect(new Set(parameterlessRoutes)).toEqual(
       new Set([
+        "expertInspiration",
         "root",
         "usage",
         "issues",
@@ -39,6 +40,7 @@ describe("paths.workspace() shape", () => {
     // and that their second URL segment matches the method name's kebab-case.
     const expectedSegments: Array<[string, string]> = [
       ["usage", "usage"],
+      ["expertInspiration", "expert-inspiration"],
       ["issues", "issues"],
       ["projects", "projects"],
       ["autopilots", "autopilots"],

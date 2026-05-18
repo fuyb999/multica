@@ -66,7 +66,33 @@ import { useT } from "../../i18n";
 const uiLogger = createLogger("chat.ui");
 const apiLogger = createLogger("chat.api");
 
-export function ChatWindow() {
+interface ChatWindowProps {
+  embedded?: boolean;
+  onSendOverride?: (content: string, attachmentIds?: string[]) => Promise<void> | void;
+  messagesOverride?: ChatMessage[];
+  titleOverride?: string;
+  isRunningOverride?: boolean;
+  noAgentOverride?: boolean;
+  inputDisabled?: boolean;
+  inputDisabledReason?: string;
+  hideNewChatButton?: boolean;
+  hideAgentControls?: boolean;
+  disableUpload?: boolean;
+}
+
+export function ChatWindow({
+  embedded = false,
+  onSendOverride,
+  messagesOverride,
+  titleOverride,
+  isRunningOverride,
+  noAgentOverride,
+  inputDisabled,
+  inputDisabledReason,
+  hideNewChatButton = false,
+  hideAgentControls = false,
+  disableUpload = false,
+}: ChatWindowProps = {}) {
   const { t } = useT("chat");
   const wsId = useWorkspaceId();
   const isOpen = useChatStore((s) => s.isOpen);
@@ -86,11 +112,11 @@ export function ChatWindow() {
     chatMessagesOptions(activeSessionId ?? ""),
   );
   // When no active session, always show empty — don't use stale cache
-  const messages = activeSessionId ? rawMessages ?? [] : [];
+  const messages = messagesOverride ?? (activeSessionId ? rawMessages ?? [] : []);
   // Skeleton only shows for an un-cached session fetch. Cached switches
   // return data synchronously — no flash. `enabled: false` (new chat)
   // keeps isLoading false so the starter prompts aren't hidden.
-  const showSkeleton = !!activeSessionId && messagesLoading;
+  const showSkeleton = !messagesOverride && !!activeSessionId && messagesLoading;
 
   // Server-authoritative pending task. Survives refresh / reopen / session
   // switch because it's keyed on sessionId in the Query cache; WS events
@@ -100,7 +126,20 @@ export function ChatWindow() {
   const { data: pendingTask } = useQuery(
     pendingChatTaskOptions(activeSessionId ?? ""),
   );
-  const pendingTaskId = pendingTask?.task_id ?? null;
+  const overrideStartedAtRef = useRef(new Date().toISOString());
+  useEffect(() => {
+    if (isRunningOverride) overrideStartedAtRef.current = new Date().toISOString();
+  }, [isRunningOverride]);
+
+  const isOverrideRunning = isRunningOverride ?? false;
+  const effectivePendingTask: ChatPendingTask | undefined = isOverrideRunning
+    ? {
+        task_id: "override-running",
+        status: "running",
+        created_at: overrideStartedAtRef.current,
+      }
+    : pendingTask;
+  const pendingTaskId = effectivePendingTask?.task_id ?? null;
 
   // Legacy archived sessions (the old soft-archive feature was removed but
   // pre-existing rows with status='archived' may still exist) render as
@@ -132,7 +171,7 @@ export function ChatWindow() {
   // few hundred ms before the agent list query resolves. Only `"none"`
   // (server confirmed: zero usable agents) drives the disabled UI.
   const agentAvailability = useWorkspaceAgentAvailability();
-  const noAgent = agentAvailability === "none";
+  const noAgent = noAgentOverride ?? agentAvailability === "none";
 
   // Presence drives both the avatar status dot (via ActorAvatar) and the
   // OfflineBanner / TaskStatusPill availability copy. `useAgentPresenceDetail`
@@ -261,6 +300,11 @@ export function ChatWindow() {
 
   const handleSend = useCallback(
     async (content: string, attachmentIds?: string[]) => {
+      if (onSendOverride) {
+        await onSendOverride(content, attachmentIds);
+        return;
+      }
+
       if (!activeAgent) {
         apiLogger.warn("sendChatMessage skipped: no active agent");
         return;
@@ -350,6 +394,7 @@ export function ChatWindow() {
       ensureSession,
       qc,
       setActiveSession,
+      onSendOverride,
     ],
   );
 
@@ -440,16 +485,20 @@ export function ChatWindow() {
   // a real message, or a pending task whose timeline will stream in.
   const hasMessages = messages.length > 0 || !!pendingTaskId;
 
-  const isVisible = isOpen && (isExpanded || boundsReady);
+  const isVisible = embedded || (isOpen && (isExpanded || boundsReady));
 
-  const containerClass = isExpanded
-    ? "absolute inset-3 z-50 flex flex-col rounded-xl ring-1 ring-foreground/10 bg-sidebar shadow-2xl overflow-hidden"
-    : "absolute bottom-2 right-2 z-50 flex flex-col rounded-xl ring-1 ring-foreground/10 bg-sidebar shadow-2xl overflow-hidden";
-  const containerStyle: React.CSSProperties = {
-    ...(!isExpanded ? { width: renderWidth, height: renderHeight } : {}),
-    transformOrigin: "bottom right",
-    pointerEvents: isOpen ? "auto" : "none",
-  };
+  const containerClass = embedded
+    ? "relative flex h-full w-full flex-col rounded-none bg-sidebar overflow-hidden"
+    : isExpanded
+      ? "absolute inset-3 z-50 flex flex-col rounded-xl ring-1 ring-foreground/10 bg-sidebar shadow-2xl overflow-hidden"
+      : "absolute bottom-2 right-2 z-50 flex flex-col rounded-xl ring-1 ring-foreground/10 bg-sidebar shadow-2xl overflow-hidden";
+  const containerStyle: React.CSSProperties = embedded
+    ? { pointerEvents: "auto" }
+    : {
+        ...(!isExpanded ? { width: renderWidth, height: renderHeight } : {}),
+        transformOrigin: "bottom right",
+        pointerEvents: isOpen ? "auto" : "none",
+      };
 
   return (
     <motion.div
@@ -457,11 +506,15 @@ export function ChatWindow() {
       className={containerClass}
       style={containerStyle}
       layout="position"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{
-        opacity: isVisible ? 1 : 0,
-        scale: isVisible ? 1 : 0.95,
-      }}
+      initial={embedded ? false : { opacity: 0, scale: 0.95 }}
+      animate={
+        embedded
+          ? { opacity: 1, scale: 1 }
+          : {
+              opacity: isVisible ? 1 : 0,
+              scale: isVisible ? 1 : 0.95,
+            }
+      }
       transition={{
         layout: isDragging
           ? { duration: 0 }
@@ -470,67 +523,77 @@ export function ChatWindow() {
         scale: { type: "spring", duration: 0.2, bounce: 0 },
       }}
     >
-      {!isExpanded && <ChatResizeHandles onDragStart={startDrag} />}
+      {!embedded && !isExpanded && <ChatResizeHandles onDragStart={startDrag} />}
       {/* Header — ⊕ new + session dropdown | window tools */}
       <div className="flex items-center justify-between border-b px-4 py-2.5 gap-2">
         <div className="flex items-center gap-1 min-w-0">
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="rounded-full text-muted-foreground"
-                  onClick={handleNewChat}
-                />
-              }
-            >
-              <Plus />
-            </TooltipTrigger>
-            <TooltipContent side="top">{t(($) => $.window.new_chat_tooltip)}</TooltipContent>
-          </Tooltip>
-          <SessionDropdown
-            sessions={sessions}
-            // Use the full agent list (incl. archived) so historical
-            // sessions can still resolve their avatar.
-            agents={agents}
-            activeSessionId={activeSessionId}
-            onSelectSession={handleSelectSession}
-          />
+          {!hideNewChatButton && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="rounded-full text-muted-foreground"
+                    onClick={handleNewChat}
+                  />
+                }
+              >
+                <Plus />
+              </TooltipTrigger>
+              <TooltipContent side="top">{t(($) => $.window.new_chat_tooltip)}</TooltipContent>
+            </Tooltip>
+          )}
+          {titleOverride ? (
+            <div className="min-w-0 truncate px-2 text-sm font-medium">{titleOverride}</div>
+          ) : (
+            <SessionDropdown
+              sessions={sessions}
+              // Use the full agent list (incl. archived) so historical
+              // sessions can still resolve their avatar.
+              agents={agents}
+              activeSessionId={activeSessionId}
+              onSelectSession={handleSelectSession}
+            />
+          )}
         </div>
         <div className="flex items-center gap-0.5 shrink-0">
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-muted-foreground"
-                  onClick={toggleExpand}
-                />
-              }
-            >
-              {isExpanded || isAtMax ? <Minimize2 /> : <Maximize2 />}
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              {isExpanded || isAtMax ? t(($) => $.window.restore_tooltip) : t(($) => $.window.expand_tooltip)}
-            </TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="text-muted-foreground"
-                  onClick={handleMinimize}
-                />
-              }
-            >
-              <Minus />
-            </TooltipTrigger>
-            <TooltipContent side="top">{t(($) => $.window.minimize_tooltip)}</TooltipContent>
-          </Tooltip>
+          {!embedded && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-muted-foreground"
+                    onClick={toggleExpand}
+                  />
+                }
+              >
+                {isExpanded || isAtMax ? <Minimize2 /> : <Maximize2 />}
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                {isExpanded || isAtMax ? t(($) => $.window.restore_tooltip) : t(($) => $.window.expand_tooltip)}
+              </TooltipContent>
+            </Tooltip>
+          )}
+          {!embedded && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-muted-foreground"
+                    onClick={handleMinimize}
+                  />
+                }
+              >
+                <Minus />
+              </TooltipTrigger>
+              <TooltipContent side="top">{t(($) => $.window.minimize_tooltip)}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
 
@@ -540,7 +603,7 @@ export function ChatWindow() {
       ) : hasMessages ? (
         <ChatMessageList
           messages={messages}
-          pendingTask={pendingTask}
+          pendingTask={effectivePendingTask}
           availability={availability}
         />
       ) : (
@@ -560,32 +623,35 @@ export function ChatWindow() {
        *  We key off `noAgent` (the resolved-empty state) rather than
        *  `!activeAgent`, so the loading window between mount and the
        *  first agent-list response stays banner-free. */}
-      {noAgent ? (
+      {!hideAgentControls && (noAgent ? (
         <NoAgentBanner />
       ) : (
         <OfflineBanner agentName={activeAgent?.name} availability={availability} />
-      )}
+      ))}
 
       {/* Input — disabled for legacy archived sessions; locked out entirely
        *  when there's no agent (the EmptyState above carries the CTA). */}
       <ChatInput
         onSend={handleSend}
-        onUploadFile={handleUploadFile}
-        onStop={handleStop}
+        onUploadFile={disableUpload ? undefined : handleUploadFile}
+        onStop={isOverrideRunning ? undefined : handleStop}
         isRunning={!!pendingTaskId}
-        disabled={isSessionArchived}
+        disabled={isSessionArchived || inputDisabled}
         noAgent={noAgent}
         agentName={activeAgent?.name}
-        topSlot={<ContextAnchorCard />}
+        placeholderOverride={inputDisabledReason}
+        topSlot={hideAgentControls ? undefined : <ContextAnchorCard />}
         leftAdornment={
-          <AgentDropdown
-            agents={availableAgents}
-            activeAgent={activeAgent}
-            userId={user?.id}
-            onSelect={handleSelectAgent}
-          />
+          hideAgentControls ? undefined : (
+            <AgentDropdown
+              agents={availableAgents}
+              activeAgent={activeAgent}
+              userId={user?.id}
+              onSelect={handleSelectAgent}
+            />
+          )
         }
-        rightAdornment={<ContextAnchorButton />}
+        rightAdornment={hideAgentControls ? undefined : <ContextAnchorButton />}
       />
     </motion.div>
   );

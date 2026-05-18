@@ -11,6 +11,16 @@ export type {
   ImportStarterIssuePayload,
   ImportStarterWelcomeIssueTemplate,
 } from "./client";
+export {
+  EMPTY_EXPERT_INSPIRATION_SESSION,
+  EMPTY_EXPERT_INSPIRATION_SESSION_LIST,
+  ExpertInspirationSessionSchema,
+  ExpertInspirationSessionListSchema,
+} from "./schemas";
+export type {
+  ExpertInspirationSession,
+  CreateExpertInspirationSessionRequest,
+} from "../types";
 export { parseWithFallback, setSchemaLogger } from "./schema";
 export type { ParseOptions } from "./schema";
 export { WSClient } from "./ws-client";

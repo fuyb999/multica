@@ -65,10 +65,10 @@ export default function OnboardingPage() {
         onComplete={(ws) => {
           // No more firstIssueId handoff — the welcome issue is created
           // inside the workspace via StarterContentPrompt, not during
-          // onboarding. Always land on the workspace issues list (or
-          // root if the flow never produced a workspace).
+          // onboarding. Always land on the workspace expert inspiration
+          // page (or root if the flow never produced a workspace).
           if (ws) {
-            router.push(paths.workspace(ws.slug).issues());
+            router.push(paths.workspace(ws.slug).expertInspiration());
           } else {
             router.push(paths.root());
           }

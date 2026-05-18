@@ -56,7 +56,7 @@ const externalLinkText = (label: string) => (
 export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
-      <span className="font-semibold text-base">Multica Docs</span>
+      <span className="font-semibold text-base">AI分析师 Docs</span>
     ),
   },
   links: [
@@ -68,7 +68,7 @@ export const baseOptions: BaseLayoutProps = {
     },
     {
       icon: <MulticaMark />,
-      text: externalLinkText("Multica"),
+      text: externalLinkText("AI分析师"),
       url: "https://multica.ai",
       external: true,
     },

@@ -12,6 +12,9 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource-variable/source-serif-4": "^5.2.9",
+    "@fontsource/geist-mono": "^5.2.7",
     "@multica/ui": "workspace:*",
     "fumadocs-core": "^15.5.2",
     "fumadocs-mdx": "^12.0.3",

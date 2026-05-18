@@ -1,13 +1,15 @@
 import { test, expect } from "@playwright/test";
-import { loginAsDefault, createTestApi } from "./helpers";
+import { loginWithApi, createTestApi, resetIssueViewState } from "./helpers";
 import type { TestApiClient } from "./fixtures";
 
 test.describe("Issues", () => {
   let api: TestApiClient;
+  let workspaceSlug: string;
 
   test.beforeEach(async ({ page }) => {
     api = await createTestApi();
-    await loginAsDefault(page);
+    workspaceSlug = await loginWithApi(page, api);
+    await resetIssueViewState(page, workspaceSlug);
   });
 
   test.afterEach(async () => {
@@ -18,19 +20,22 @@ test.describe("Issues", () => {
 
   test("issues page loads with board view", async ({ page }) => {
     await api.createIssue("E2E Board View " + Date.now());
-    await page.reload();
+    await page.goto(`/${workspaceSlug}/issues`);
 
     // Board columns should be visible
-    await expect(page.locator("text=Backlog")).toBeVisible();
-    await expect(page.locator("text=Todo")).toBeVisible();
-    await expect(page.locator("text=In Progress")).toBeVisible();
+    const main = page.locator("main");
+    await expect(main.getByText("Backlog")).toBeVisible({ timeout: 10000 });
+    await expect(main.getByText("Todo")).toBeVisible();
+    await expect(main.getByText("In Progress")).toBeVisible();
   });
 
   test("can switch from board to list view", async ({ page }) => {
     const title = "E2E List Switch " + Date.now();
     await api.createIssue(title);
-    await page.reload();
-    await expect(page.locator("text=Backlog")).toBeVisible();
+    await page.goto(`/${workspaceSlug}/issues`);
+    await expect(page.locator("main").getByText("Backlog")).toBeVisible({
+      timeout: 10000,
+    });
 
     // Switch to list view
     await page.click("text=List");
@@ -41,6 +46,7 @@ test.describe("Issues", () => {
     const newIssueButton = page.getByRole("button", { name: "New Issue" });
     await expect(newIssueButton).toBeVisible();
     await newIssueButton.click();
+    await page.getByRole("button", { name: "Switch to Manual" }).click();
 
     const title = "E2E Created " + Date.now();
     const titleInput = page.getByRole("textbox", { name: "Issue title" });
@@ -55,7 +61,9 @@ test.describe("Issues", () => {
 
     await page.getByRole("button", { name: "View issue" }).click();
     await page.waitForURL(/\/issues\/[\w-]+/);
-    await expect(page.locator("text=Properties")).toBeVisible();
+    await expect(
+      page.locator("main").getByRole("textbox", { name: "Issue title" }),
+    ).toContainText(title, { timeout: 10000 });
   });
 
   test("can navigate to issue detail page", async ({ page }) => {
@@ -63,19 +71,17 @@ test.describe("Issues", () => {
     const issue = await api.createIssue("E2E Detail Test " + Date.now());
 
     // Reload to see the new issue
-    await page.reload();
+    await page.goto(`/${workspaceSlug}/issues`);
 
-    // Navigate to the issue detail. Use a suffix match so the selector works
-    // whether the href is legacy `/issues/{id}` or URL-refactored
-    // `/{slug}/issues/{id}`.
-    const issueLink = page.locator(`a[href$="/issues/${issue.id}"]`);
+    const issueLink = page.getByRole("link", { name: new RegExp(issue.title) });
     await expect(issueLink).toBeVisible({ timeout: 5000 });
     await issueLink.click();
 
     await page.waitForURL(/\/issues\/[\w-]+/);
 
-    // Should show Properties panel
-    await expect(page.locator("text=Properties")).toBeVisible();
+    await expect(
+      page.locator("main").getByRole("textbox", { name: "Issue title" }),
+    ).toContainText(issue.title, { timeout: 10000 });
     // Should show breadcrumb link back to Issues
     await expect(
       page.locator("a", { hasText: "Issues" }).first(),
@@ -84,6 +90,7 @@ test.describe("Issues", () => {
 
   test("can dismiss issue creation", async ({ page }) => {
     await page.getByRole("button", { name: "New Issue" }).click();
+    await page.getByRole("button", { name: "Switch to Manual" }).click();
 
     const titleInput = page.getByRole("textbox", { name: "Issue title" });
     await expect(titleInput).toBeVisible();

@@ -1,4 +1,4 @@
-# Self-hosting Docker Compose — starts PostgreSQL, backend, and frontend.
+# Self-hosting Docker Compose — starts PostgreSQL, backend, frontend, and the optional agent daemon.
 #
 # Usage:
 #   cp .env.example .env
@@ -7,6 +7,7 @@
 #
 # Frontend: http://localhost:3000
 # Backend:  http://localhost:8080 (also used by CLI/daemon)
+# Daemon:   docker compose -f docker-compose.selfhost.yml --profile daemon up -d agent-daemon
 
 name: multica
 
@@ -18,7 +19,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-multica}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-multica}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${POSTGRES_PORT:-8432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: unless-stopped
@@ -80,6 +81,38 @@ services:
       HOSTNAME: "0.0.0.0"
     restart: unless-stopped
 
+  agent-daemon:
+    image: ${MULTICA_AGENT_IMAGE:-${MULTICA_BACKEND_IMAGE:-ghcr.io/multica-ai/multica-backend}}:${MULTICA_IMAGE_TAG:-latest}
+    profiles: ["daemon"]
+    depends_on:
+      - backend
+    entrypoint: ["./multica"]
+    command: ["daemon", "start", "--foreground"]
+    environment:
+      HOME: /home/multica
+      MULTICA_SERVER_URL: http://backend:8080
+      MULTICA_APP_URL: ${MULTICA_APP_URL:-http://localhost:3000}
+      MULTICA_CLAUDE_PATH: ${MULTICA_CLAUDE_PATH:-claude}
+      MULTICA_CLAUDE_MODEL: ${MULTICA_CLAUDE_MODEL:-}
+      MULTICA_CLAUDE_ARGS: ${MULTICA_CLAUDE_ARGS:-}
+      MULTICA_CODEX_PATH: ${MULTICA_CODEX_PATH:-codex}
+      MULTICA_CODEX_MODEL: ${MULTICA_CODEX_MODEL:-}
+      MULTICA_CODEX_ARGS: ${MULTICA_CODEX_ARGS:-}
+      MULTICA_DAEMON_ID: ${MULTICA_DAEMON_ID:-}
+      MULTICA_DAEMON_DEVICE_NAME: ${MULTICA_DAEMON_DEVICE_NAME:-Docker Agent}
+      MULTICA_AGENT_RUNTIME_NAME: ${MULTICA_AGENT_RUNTIME_NAME:-Docker Agent}
+      MULTICA_DAEMON_POLL_INTERVAL: ${MULTICA_DAEMON_POLL_INTERVAL:-3s}
+      MULTICA_DAEMON_HEARTBEAT_INTERVAL: ${MULTICA_DAEMON_HEARTBEAT_INTERVAL:-15s}
+      MULTICA_DAEMON_AUTO_UPDATE: "false"
+      MULTICA_WORKSPACES_ROOT: /home/multica/workspaces
+    volumes:
+      - ${MULTICA_CLI_CONFIG_DIR:-~/.multica}:/home/multica/.multica
+      - ${MULTICA_WORKSPACES_DIR:-multica_agent_workspaces}:/home/multica/workspaces
+      - ${CLAUDE_CONFIG_DIR:-~/.claude}:/home/multica/.claude:ro
+      - ${CODEX_CONFIG_DIR:-~/.codex}:/home/multica/.codex:ro
+    restart: unless-stopped
+
 volumes:
   pgdata:
   backend_uploads:
+  multica_agent_workspaces:

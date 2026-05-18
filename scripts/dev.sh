@@ -18,7 +18,9 @@ if [ ${#missing[@]} -gt 0 ]; then
 fi
 
 # ---------- Environment file ----------
-if [ -f .git ]; then
+if [ -n "${ENV_FILE:-}" ]; then
+  :
+elif [ -f .git ]; then
   # Inside a git worktree (.git is a file, not a directory)
   ENV_FILE=".env.worktree"
   if [ ! -f "$ENV_FILE" ]; then
@@ -55,11 +57,20 @@ echo "==> Running migrations..."
 # ---------- Start services ----------
 echo ""
 echo "✓ Ready. Starting services..."
-echo "  Backend:  http://localhost:${PORT:-8080}"
-echo "  Frontend: http://localhost:${FRONTEND_PORT:-3000}"
-echo ""
+echo "  If :${PORT:-8080} or :${FRONTEND_PORT:-3000} is already in use, the daemon will reuse the existing process."
+start_supervisor() {
+  local log_dir="${LOG_DIR:-/tmp/multica-dev}"
+  if command -v screen >/dev/null 2>&1; then
+    if ! screen -ls 2>/dev/null | grep -q "[.]multica-dev[[:space:]]"; then
+      screen -dmS multica-dev env ENV_FILE="$ENV_FILE" LOG_DIR="$log_dir" bash scripts/dev-daemon.sh
+    fi
+  else
+    ENV_FILE="$ENV_FILE" LOG_DIR="$log_dir" nohup bash scripts/dev-daemon.sh >/dev/null 2>&1 &
+  fi
+}
 
-trap 'kill 0' EXIT
-(cd server && go run ./cmd/server) &
-pnpm dev:web &
-wait
+start_supervisor
+echo "  Supervisor log: ${LOG_DIR:-/tmp/multica-dev}/supervisor.log"
+echo "  Backend log:    ${LOG_DIR:-/tmp/multica-dev}/backend.log"
+echo "  Frontend log:   ${LOG_DIR:-/tmp/multica-dev}/frontend.log"
+echo "  To stop:        make stop ENV_FILE=$ENV_FILE"

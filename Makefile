@@ -64,7 +64,7 @@ selfhost: ## Create .env if needed, then pull and start the official self-hosted
 		fi; \
 		echo "==> Generated random JWT_SECRET"; \
 	fi
-	@echo "==> Pulling official Multica images..."
+	@echo "==> Pulling official AI分析师 images..."
 	@if ! docker compose -f docker-compose.selfhost.yml pull; then \
 		echo ""; \
 		echo "Official images for tag '$${MULTICA_IMAGE_TAG:-latest}' are not published yet."; \
@@ -72,7 +72,7 @@ selfhost: ## Create .env if needed, then pull and start the official self-hosted
 		echo "  make selfhost-build"; \
 		exit 1; \
 	fi
-	@echo "==> Starting Multica via Docker Compose..."
+	@echo "==> Starting AI分析师 via Docker Compose..."
 	docker compose -f docker-compose.selfhost.yml up -d
 	@echo "==> Waiting for backend to be ready..."
 	@for i in $$(seq 1 30); do \
@@ -83,7 +83,7 @@ selfhost: ## Create .env if needed, then pull and start the official self-hosted
 	done
 	@if curl -sf http://localhost:$${PORT:-8080}/health > /dev/null 2>&1; then \
 		echo ""; \
-		echo "✓ Multica is running!"; \
+		echo "✓ AI分析师 is running!"; \
 		echo "  Frontend: http://localhost:$${FRONTEND_PORT:-3000}"; \
 		echo "  Backend:  http://localhost:$${PORT:-8080}"; \
 		echo ""; \
@@ -96,6 +96,9 @@ selfhost: ## Create .env if needed, then pull and start the official self-hosted
 		echo "Next — install the CLI and connect your machine:"; \
 		echo "  brew install multica-ai/tap/multica"; \
 		echo "  multica setup self-host"; \
+		echo ""; \
+		echo "Optional Docker daemon with Claude Code and Codex preinstalled:"; \
+		echo "  docker compose -f docker-compose.selfhost.yml --profile daemon up -d agent-daemon"; \
 	else \
 		echo ""; \
 		echo "Services are still starting. Check logs:"; \
@@ -114,7 +117,7 @@ selfhost-build: ## Build backend/web from the current checkout and start the sel
 		fi; \
 		echo "==> Generated random JWT_SECRET"; \
 	fi
-	@echo "==> Building Multica from the current checkout..."
+	@echo "==> Building AI分析师 from the current checkout..."
 	docker compose -f docker-compose.selfhost.yml -f docker-compose.selfhost.build.yml up -d --build
 	@echo "==> Waiting for backend to be ready..."
 	@for i in $$(seq 1 30); do \
@@ -125,7 +128,7 @@ selfhost-build: ## Build backend/web from the current checkout and start the sel
 	done
 	@if curl -sf http://localhost:$${PORT:-8080}/health > /dev/null 2>&1; then \
 		echo ""; \
-		echo "✓ Multica is running!"; \
+		echo "✓ AI分析师 is running!"; \
 		echo "  Frontend: http://localhost:$${FRONTEND_PORT:-3000}"; \
 		echo "  Backend:  http://localhost:$${PORT:-8080}"; \
 		echo ""; \
@@ -138,6 +141,9 @@ selfhost-build: ## Build backend/web from the current checkout and start the sel
 		echo "Next — install the CLI and connect your machine:"; \
 		echo "  brew install multica-ai/tap/multica"; \
 		echo "  multica setup self-host"; \
+		echo ""; \
+		echo "Optional Docker daemon with Claude Code and Codex preinstalled:"; \
+		echo "  docker compose -f docker-compose.selfhost.yml --profile daemon up -d agent-daemon"; \
 	else \
 		echo ""; \
 		echo "Services are still starting. Check logs:"; \
@@ -145,7 +151,7 @@ selfhost-build: ## Build backend/web from the current checkout and start the sel
 	fi
 
 selfhost-stop: ## Stop the self-hosted Docker Compose stack
-	@echo "==> Stopping Multica services..."
+	@echo "==> Stopping AI分析师 services..."
 	docker compose -f docker-compose.selfhost.yml down
 	@echo "✓ All services stopped."
 
@@ -244,7 +250,7 @@ setup-worktree: ## Ensure .env.worktree exists, then prepare this worktree
 	@$(MAKE) setup ENV_FILE=$(WORKTREE_ENV_FILE)
 
 start-worktree: ## Start this worktree using .env.worktree
-	@$(MAKE) start ENV_FILE=$(WORKTREE_ENV_FILE)
+	@ENV_FILE=$(WORKTREE_ENV_FILE) bash scripts/dev-local.sh
 
 stop-worktree: ## Stop this worktree's backend and frontend processes
 	@$(MAKE) stop ENV_FILE=$(WORKTREE_ENV_FILE)
@@ -256,7 +262,7 @@ check-worktree: ## Run the full verification pipeline for this worktree
 ##@ Individual commands
 
 dev: ## Bootstrap this checkout end-to-end: create env if needed, ensure DB, migrate, start services
-	@bash scripts/dev.sh
+	@bash scripts/dev-local.sh
 
 server: ## Run only the Go server for the current checkout
 	$(REQUIRE_ENV)

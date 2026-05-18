@@ -1,11 +1,11 @@
 ---
 title: Self-Hosting Guide
-description: Deploy Multica on your own infrastructure.
+description: Deploy AI分析师 on your own infrastructure.
 ---
 
 ## Architecture Overview
 
-Multica has three components:
+AI分析师 has three components:
 
 | Component | Description | Technology |
 |-----------|-------------|------------|
@@ -31,7 +31,7 @@ curl -fsSL https://raw.githubusercontent.com/multica-ai/multica/main/scripts/ins
 multica setup self-host
 ```
 
-This installs the CLI, checks out the latest self-host assets, pulls the official Multica images from GHCR, and configures everything for localhost. Then open http://localhost:3000 and pick a login method: configure `RESEND_API_KEY` in `.env` for email-based codes (recommended), or leave Resend unset and copy the generated code from backend logs. See [Step 2 — Log In](#step-2--log-in) for details.
+This installs the CLI, checks out the latest self-host assets, pulls the official AI分析师 images from GHCR, and configures everything for localhost. Then open http://localhost:3000 and pick a login method: configure `RESEND_API_KEY` in `.env` for email-based codes (recommended), or leave Resend unset and copy the generated code from backend logs. See [Step 2 — Log In](#step-2--log-in) for details.
 
 <Callout>
 If the self-host server is already running and you only need the CLI on a macOS/Linux machine, install it with Homebrew: `brew install multica-ai/tap/multica`.
@@ -143,9 +143,9 @@ make selfhost-stop
 multica daemon stop
 ```
 
-## Switching to Multica Cloud
+## Switching to AI分析师 Cloud
 
-If you've been self-hosting and want to switch your CLI to [Multica Cloud](https://multica.ai):
+If you've been self-hosting and want to switch your CLI to [AI分析师 Cloud](https://multica.ai):
 
 ```bash
 multica setup
@@ -183,7 +183,7 @@ All configuration is done via environment variables. Copy `.env.example` as a st
 
 ### Email (Required for Authentication)
 
-Multica uses email-based magic link authentication via [Resend](https://resend.com).
+AI分析师 uses email-based magic link authentication via [Resend](https://resend.com).
 
 | Variable | Description |
 |----------|-------------|
@@ -271,7 +271,7 @@ Agent-specific overrides:
 
 ## Database Setup
 
-Multica requires PostgreSQL 17 with the pgvector extension.
+AI分析师 requires PostgreSQL 17 with the pgvector extension.
 
 ### Using the Included Docker Compose
 

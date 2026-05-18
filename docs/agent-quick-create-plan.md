@@ -65,7 +65,7 @@ Skill 是一个**按需加载的能力包**,本质是 SKILL.md 文件 + 可选�
 
 每个 runtime(Claude Code / Cursor / Codex 等)启动时**自动扫**自己约定的目录(`~/.claude/skills/`、`.cursor/skills/` 等),读 SKILL.md 的 frontmatter 形成"我手上有这些 skill"的清单注入 system prompt。具体 skill 正文只在被触发时才进 context。
 
-### 2.2 Multica 的 Skill 数据模型
+### 2.2 AI分析师 的 Skill 数据模型
 
 3 张表(migration `008_structured_skills.up.sql`):
 
@@ -111,7 +111,7 @@ Skill 是一个**按需加载的能力包**,本质是 SKILL.md 文件 + 可选�
    PG 是真相源,workDir 是每次任务临时复印件
 ```
 
-**核心 invariant**:Multica 不教 runtime 怎么用 skill,只把文件摆到 runtime 已经会扫的位置。
+**核心 invariant**:AI分析师 不教 runtime 怎么用 skill,只把文件摆到 runtime 已经会扫的位置。
 
 ### 2.4 Template = Instructions + Skill 引用
 
@@ -418,7 +418,7 @@ Quick-create Issue 当前的设计就要求用户**预先有一个 agent** 才�
 
 **结构错配**。Anthropic 官方 marketplace(`anthropics/claude-plugins-official`)是 **plugin 体系**:每个 plugin 是个 bundle,包含 `.claude-plugin/plugin.json` + `skills/` + `agents/` + `hooks/` + `.mcp.json`。
 
-Multica 只有**单体 skill**(SKILL.md + skill_file),没有 plugin / bundle 概念。要接入得新写 plugin parser + 拆分逻辑,工作量大,而 skills.sh 已经覆盖了同一批高质量内容(skills.sh 后端就是 GitHub raw,绝大多数 skill 作者就在 GitHub 上,Anthropic plugin 体系里的 skill 通常也在作者的 GitHub repo 里有单体副本)。
+AI分析师 只有**单体 skill**(SKILL.md + skill_file),没有 plugin / bundle 概念。要接入得新写 plugin parser + 拆分逻辑,工作量大,而 skills.sh 已经覆盖了同一批高质量内容(skills.sh 后端就是 GitHub raw,绝大多数 skill 作者就在 GitHub 上,Anthropic plugin 体系里的 skill 通常也在作者的 GitHub repo 里有单体副本)。
 
 ### 5.2 为什么走 quick-create 模式而不是后端直接调 LLM?
 
@@ -439,7 +439,7 @@ Multica 只有**单体 skill**(SKILL.md + skill_file),没有 plugin / bundle 概
 
 如果做成 SKILL.md 文件:
 - 它得装进某个 agent 里才能用 → 单点功能变得需要前置配置
-- skill 教 agent 调什么?调 `npx skills`(装到本地,目标错)?调 Multica API(那要写 tool channel,绕一大圈)
+- skill 教 agent 调什么?调 `npx skills`(装到本地,目标错)?调 AI分析师 API(那要写 tool channel,绕一大圈)
 - AI 创建 Agent(Phase 3)那条路要"启动 agent → agent 调 skill → skill 调 tool",链路复杂三倍
 
 做成 endpoint:
@@ -462,7 +462,7 @@ Multica 只有**单体 skill**(SKILL.md + skill_file),没有 plugin / bundle 概
 **现状**:`POST /api/skills/import` 当前支持 3 个 source(`fetchFromClawHub` skill.go:642-744、`fetchFromSkillsSh` skill.go:757-879、`fetchFromGitHub` skill.go:1363-1463)。ClawHub 是个独立 HTTP 客户端,不复用 GitHub 基础设施。
 
 **判断**(详见之前讨论):
-- ClawHub 服务的是 OpenClaw 平台(Multica 同生态位竞品的内容生态)
+- ClawHub 服务的是 OpenClaw 平台(AI分析师 同生态位竞品的内容生态)
 - UI 没有发现/搜索层,用户只能粘 URL,而 ClawHub 装机量远低于 skills.sh,用户主动逛的概率极低
 - 独立代码路径,API 演进时单独跟进
 
@@ -550,6 +550,6 @@ Multica 只有**单体 skill**(SKILL.md + skill_file),没有 plugin / bundle 概
 | Quick-create 完成检测 + inbox | `server/internal/service/task.go:1810-1949` |
 | LinkTaskToIssue | `server/internal/handler/agent.go:97-105` |
 | Quick-create Issue 前端 modal | `packages/views/modals/quick-create-issue.tsx:48-570+` |
-| Multica CLI 入口 | `server/cmd/multica/main.go:62-79` |
+| AI分析师 CLI 入口 | `server/cmd/multica/main.go:62-79` |
 | Skill CLI 命令 | `server/cmd/multica/cmd_skill.go:17-96`(已有 import,无 find) |
 | Agent CLI 命令 | `server/cmd/multica/cmd_agent.go:101-112`(已有 list/get,无 create) |

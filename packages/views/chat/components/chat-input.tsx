@@ -37,6 +37,7 @@ interface ChatInputProps {
   noAgent?: boolean;
   /** Name of the currently selected agent, used in the placeholder. */
   agentName?: string;
+  placeholderOverride?: string;
   /** Rendered at the bottom-left of the input bar — typically the agent picker. */
   leftAdornment?: ReactNode;
   /** Rendered just before the submit button — used for context-anchor action. */
@@ -54,6 +55,7 @@ export function ChatInput({
   disabled,
   noAgent,
   agentName,
+  placeholderOverride,
   leftAdornment,
   rightAdornment,
   topSlot,
@@ -179,13 +181,13 @@ export function ChatInput({
     setIsEmpty(true);
   };
 
-  const placeholder = noAgent
+  const placeholder = placeholderOverride ?? (noAgent
     ? t(($) => $.input.placeholder_no_agent)
     : disabled
       ? t(($) => $.input.placeholder_archived)
       : agentName
         ? t(($) => $.input.placeholder_named, { name: agentName })
-        : t(($) => $.input.placeholder_default);
+        : t(($) => $.input.placeholder_default));
 
   const uploadEnabled = !!onUploadFile && !disabled && !noAgent;
 

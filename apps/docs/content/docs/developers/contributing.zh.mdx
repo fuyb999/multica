@@ -1,6 +1,6 @@
 ---
 title: Contributing
-description: Local development workflow for contributors working on the Multica codebase.
+description: Local development workflow for contributors working on the AI分析师 codebase.
 ---
 
 ## Development Model
@@ -41,6 +41,8 @@ Start the app:
 ```bash
 make start-main
 ```
+
+`make start-main` / `make start-worktree` now launch backend and frontend through `scripts/dev-daemon.sh`, which keeps separate logs under `/tmp/multica-dev/` so you can inspect failures without relying on a shell session like `screen`.
 
 ### Worktree
 

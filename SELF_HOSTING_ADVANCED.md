@@ -1,6 +1,6 @@
 # Self-Hosting — Advanced Configuration
 
-This document covers advanced configuration for self-hosted Multica deployments. For the quick start guide, see [SELF_HOSTING.md](SELF_HOSTING.md).
+This document covers advanced configuration for self-hosted AI分析师 deployments. For the quick start guide, see [SELF_HOSTING.md](SELF_HOSTING.md).
 
 ## Configuration
 
@@ -25,7 +25,7 @@ These have sensible defaults and only need to be set when tuning a large or cons
 
 ### Email (Required for Authentication)
 
-Multica supports two email backends. `SMTP_HOST` takes priority when set; otherwise `RESEND_API_KEY` is used. With neither configured, verification codes are printed to the server log — copy them from there to log in.
+AI分析师 supports two email backends. `SMTP_HOST` takes priority when set; otherwise `RESEND_API_KEY` is used. With neither configured, verification codes are printed to the server log — copy them from there to log in.
 
 #### Option A: Resend (recommended for cloud deployments)
 
@@ -104,7 +104,7 @@ The `Secure` flag on session cookies is derived automatically from the scheme of
 
 ### CLI / Daemon
 
-These are configured on each user's machine, not on the server:
+These are configured on each user's machine, or on the optional `agent-daemon` Compose service when running the daemon in Docker:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -119,8 +119,10 @@ Agent-specific overrides:
 |----------|-------------|
 | `MULTICA_CLAUDE_PATH` | Custom path to the `claude` binary |
 | `MULTICA_CLAUDE_MODEL` | Override the Claude model used |
+| `MULTICA_CLAUDE_ARGS` | Extra arguments passed to Claude Code |
 | `MULTICA_CODEX_PATH` | Custom path to the `codex` binary |
 | `MULTICA_CODEX_MODEL` | Override the Codex model used |
+| `MULTICA_CODEX_ARGS` | Extra arguments passed to Codex |
 | `MULTICA_COPILOT_PATH` | Custom path to the `copilot` (GitHub Copilot CLI) binary |
 | `MULTICA_COPILOT_MODEL` | Override the Copilot model used (note: GitHub Copilot routes models through your account entitlement, so this may not be honoured) |
 | `MULTICA_OPENCODE_PATH` | Custom path to the `opencode` binary |
@@ -136,9 +138,27 @@ Agent-specific overrides:
 | `MULTICA_CURSOR_PATH` | Custom path to the `cursor-agent` binary |
 | `MULTICA_CURSOR_MODEL` | Override the Cursor Agent model used |
 
+Optional Docker daemon mounts:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MULTICA_AGENT_IMAGE` | `ghcr.io/multica-ai/multica-backend` | Image used by the `agent-daemon` Compose service |
+| `MULTICA_CLI_CONFIG_DIR` | `~/.multica` | Host CLI config directory mounted into `/home/multica/.multica` for the login token |
+| `CLAUDE_CONFIG_DIR` | `~/.claude` | Host Claude Code config mounted read-only into the daemon container |
+| `CODEX_CONFIG_DIR` | `~/.codex` | Host Codex config mounted read-only into the daemon container |
+| `MULTICA_WORKSPACES_DIR` | `multica_agent_workspaces` | Host path or named volume mounted as `/home/multica/workspaces` for task checkouts |
+
+Start it with:
+
+```bash
+docker compose -f docker-compose.selfhost.yml --profile daemon up -d agent-daemon
+```
+
+Authenticate with `multica setup self-host` on the host first so the mounted CLI config contains an AI分析师 token. Authenticate Claude Code / Codex on the host as well, or provide the environment variables those CLIs require.
+
 ## Database Setup
 
-Multica requires PostgreSQL 17 with the pgvector extension.
+AI分析师 requires PostgreSQL 17 with the pgvector extension.
 
 ### Using Docker Compose (Recommended)
 
@@ -306,7 +326,7 @@ NEXT_PUBLIC_WS_URL=wss://api.example.com/ws
 
 ## LAN / Non-localhost Access
 
-By default, Multica works on `localhost`. If you access it from another machine on the LAN (e.g. `http://192.168.1.100:3000`), you need to tell the backend to accept that origin:
+By default, AI分析师 works on `localhost`. If you access it from another machine on the LAN (e.g. `http://192.168.1.100:3000`), you need to tell the backend to accept that origin:
 
 ```bash
 # .env — replace with your server's LAN IP

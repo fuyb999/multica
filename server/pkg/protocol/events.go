@@ -29,8 +29,8 @@ const (
 	// subscribes by `task:` prefix and invalidates the workspace task
 	// snapshot, so the granularity here is "what does the user want to see
 	// change" — not "every internal status flip".
-	EventTaskQueued    = "task:queued"    // ∅ → queued (enqueue / retry create)
-	EventTaskDispatch  = "task:dispatch"  // queued → dispatched (daemon claim)
+	EventTaskQueued    = "task:queued"   // ∅ → queued (enqueue / retry create)
+	EventTaskDispatch  = "task:dispatch" // queued → dispatched (daemon claim)
 	EventTaskProgress  = "task:progress"
 	EventTaskCompleted = "task:completed" // running → completed
 	EventTaskFailed    = "task:failed"    // running → failed
@@ -71,6 +71,11 @@ const (
 	EventChatSessionRead    = "chat:session_read"
 	EventChatSessionDeleted = "chat:session_deleted"
 	EventChatSessionUpdated = "chat:session_updated"
+
+	// Expert inspiration events
+	EventExpertInspirationSessionCreated = "expert_inspiration:session_created"
+	EventExpertInspirationSessionUpdated = "expert_inspiration:session_updated"
+	EventExpertInspirationSessionEvent   = "expert_inspiration:session_event"
 
 	// Project events
 	EventProjectCreated         = "project:created"

@@ -1,11 +1,11 @@
 ---
 title: Self-Host 快速上手
-description: 在自己的服务器或本机用 Docker 把 Multica 跑起来。约 10 分钟。
+description: 在自己的服务器或本机用 Docker 把 AI分析师 跑起来。约 10 分钟。
 ---
 
 import { Callout } from "fumadocs-ui/components/callout";
 
-这一页带你用 Docker 把 Multica 的**服务器**（后端 + 前端 + PostgreSQL）跑在自己的机器或服务器上。走完这一篇你的数据就完全在自己手里——包括 [工作区](/workspaces)、[issue](/issues)、[评论](/comments)、[智能体](/agents) 配置。
+这一页带你用 Docker 把 AI分析师 的**服务器**（后端 + 前端 + PostgreSQL）跑在自己的机器或服务器上。走完这一篇你的数据就完全在自己手里——包括 [工作区](/workspaces)、[issue](/issues)、[评论](/comments)、[智能体](/agents) 配置。
 
 智能体**执行**还是靠你本地跑的 [守护进程](/daemon-runtimes) + 本地装好的 [AI 编程工具](/providers)——这点和 Cloud 完全一样。Self-host 换掉的是服务器那一层，不是执行那一层。
 
@@ -27,7 +27,7 @@ make selfhost
 `make selfhost` 会：
 
 1. 如果没有 `.env` 文件，从 `.env.example` 自动生成一份并**生成随机 JWT_SECRET**
-2. 拉取官方 Docker 镜像（PostgreSQL、Multica backend、Multica frontend）
+2. 拉取官方 Docker 镜像（PostgreSQL、AI分析师 backend、AI分析师 frontend）
 3. 用 `docker-compose.selfhost.yml` 启动全部服务
 4. 等后端 `/health` 端点准备就绪
 

@@ -9,6 +9,7 @@ import type {
   ListIssuesResponse,
   TimelineEntry,
 } from "../types";
+import type { ExpertInspirationSession } from "../types";
 
 // ---------------------------------------------------------------------------
 // Schemas for the highest-risk API endpoints — those whose responses drive
@@ -331,4 +332,47 @@ export const EMPTY_CREATE_AGENT_FROM_TEMPLATE_RESPONSE: CreateAgentFromTemplateR
   agent: { id: "" } as Agent,
   imported_skill_ids: [],
   reused_skill_ids: [],
+};
+
+const ExpertInspirationEventSchema = z.object({
+  id: z.string(),
+  session_id: z.string(),
+  workspace_id: z.string().nullable().optional(),
+  expert_run_id: z.string().nullable().optional(),
+  seq: z.number(),
+  event_type: z.string(),
+  payload: z.record(z.string(), z.unknown()).default({}),
+  created_at: z.string(),
+}).loose();
+
+export const ExpertInspirationSessionSchema = z.object({
+  id: z.string(),
+  workspace_id: z.string(),
+  created_by: z.string().nullable().optional(),
+  question: z.string().default(""),
+  status: z.string().default("queued"),
+  concurrency_limit: z.number().default(3),
+  selected_skill_ids: z.array(z.string()).default([]),
+  summary: z.string().default(""),
+  error_message: z.string().default(""),
+  created_at: z.string().default(""),
+  updated_at: z.string().default(""),
+  events: z.array(ExpertInspirationEventSchema).default([]),
+}).loose();
+
+export const ExpertInspirationSessionListSchema = z.array(ExpertInspirationSessionSchema);
+export const EMPTY_EXPERT_INSPIRATION_SESSION_LIST: ExpertInspirationSession[] = [];
+export const EMPTY_EXPERT_INSPIRATION_SESSION: ExpertInspirationSession = {
+  id: "",
+  workspace_id: "",
+  created_by: null,
+  question: "",
+  status: "queued",
+  concurrency_limit: 3,
+  selected_skill_ids: [],
+  summary: "",
+  error_message: "",
+  created_at: "",
+  updated_at: "",
+  events: [],
 };

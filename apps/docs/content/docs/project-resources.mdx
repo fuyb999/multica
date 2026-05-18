@@ -15,7 +15,7 @@ A project is no longer just a label. It is a small **resource container**:
 - A resource has a `resource_type` (e.g. `github_repo`) and a `resource_ref` (a JSON payload typed by `resource_type`).
 - New resource types add a string + a handler. **No schema migration. No frontend rewrite.**
 
-This shape is intentional — it's the same pattern Multica already uses for agent providers: a `type` discriminator and a typed payload. It keeps the schema stable so adding "Notion page", "Google Doc", "uploaded file", or "external URL" later is a small, additive change.
+This shape is intentional — it's the same pattern AI分析师 already uses for agent providers: a `type` discriminator and a typed payload. It keeps the schema stable so adding "Notion page", "Google Doc", "uploaded file", or "external URL" later is a small, additive change.
 
 ## Today: `github_repo`
 

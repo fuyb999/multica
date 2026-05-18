@@ -96,6 +96,8 @@ import type {
   GitHubConnectResponse,
   Squad,
   SquadMember,
+  ExpertInspirationSession,
+  CreateExpertInspirationSessionRequest,
 } from "../types";
 import type { OnboardingCompletionPath } from "../onboarding/types";
 import { type Logger, noopLogger } from "../logger";
@@ -117,8 +119,12 @@ import {
   EMPTY_AGENT_TEMPLATE_SUMMARY_LIST,
   EMPTY_ATTACHMENT,
   EMPTY_CREATE_AGENT_FROM_TEMPLATE_RESPONSE,
+  EMPTY_EXPERT_INSPIRATION_SESSION,
+  EMPTY_EXPERT_INSPIRATION_SESSION_LIST,
   EMPTY_GROUPED_ISSUES_RESPONSE,
   EMPTY_LIST_ISSUES_RESPONSE,
+  ExpertInspirationSessionSchema,
+  ExpertInspirationSessionListSchema,
   EMPTY_TIMELINE_ENTRIES,
   GroupedIssuesResponseSchema,
   ListIssuesResponseSchema,
@@ -393,6 +399,32 @@ export class ApiClient {
 
   async getMe(): Promise<User> {
     return this.fetch("/api/me");
+  }
+
+  async listExpertInspirationSessions(workspaceId: string): Promise<ExpertInspirationSession[]> {
+    const raw = await this.fetch<unknown>(`/api/workspaces/${workspaceId}/expert-inspiration/sessions`);
+    return parseWithFallback(
+      raw,
+      ExpertInspirationSessionListSchema,
+      EMPTY_EXPERT_INSPIRATION_SESSION_LIST,
+      { endpoint: "GET /api/workspaces/:id/expert-inspiration/sessions" },
+    );
+  }
+
+  async createExpertInspirationSession(
+    workspaceId: string,
+    body: CreateExpertInspirationSessionRequest,
+  ): Promise<ExpertInspirationSession> {
+    const raw = await this.fetch<unknown>(`/api/workspaces/${workspaceId}/expert-inspiration/sessions`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+    return parseWithFallback(
+      raw,
+      ExpertInspirationSessionSchema,
+      EMPTY_EXPERT_INSPIRATION_SESSION,
+      { endpoint: "POST /api/workspaces/:id/expert-inspiration/sessions" },
+    );
   }
 
   async markOnboardingComplete(payload?: {

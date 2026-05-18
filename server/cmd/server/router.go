@@ -214,7 +214,7 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 	// Public API
 	r.Get("/api/config", h.GetConfig)
 
-	// GitHub App webhook (no Multica auth — requests are authenticated via
+	// GitHub App webhook (no AI分析师 auth — requests are authenticated via
 	// HMAC-SHA256 signature in the handler) and post-install setup callback.
 	r.Post("/api/webhooks/github", h.HandleGitHubWebhook)
 	r.Get("/api/github/setup", h.GitHubSetupCallback)
@@ -539,6 +539,11 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 			// Workspace-wide agent task snapshot for presence derivation:
 			// every active task + each agent's most recent terminal task.
 			r.Get("/api/agent-task-snapshot", h.ListWorkspaceAgentTaskSnapshot)
+			r.Route("/api/workspaces/{workspaceId}/expert-inspiration", func(r chi.Router) {
+				r.Get("/sessions", h.ListExpertInspirationSessions)
+				r.Post("/sessions", h.CreateExpertInspirationSession)
+				r.Get("/sessions/{sessionId}", h.GetExpertInspirationSession)
+			})
 
 			// Workspace-wide daily agent activity (last 30d, anchored on
 			// completed_at). Backs the Agents-list sparkline (trailing 7d

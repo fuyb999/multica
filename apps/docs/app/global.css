@@ -1,3 +1,6 @@
+@import "@fontsource-variable/inter/index.css";
+@import "@fontsource-variable/source-serif-4/index.css";
+@import "@fontsource/geist-mono/index.css";
 @import "tailwindcss";
 @import "fumadocs-ui/css/preset.css";
 @import "../../../packages/ui/styles/tokens.css";
@@ -7,20 +10,27 @@
 @source "../../../packages/ui/**/*.{ts,tsx}";
 
 /* ---------------------------------------------------------------------------
- * Multica Docs — editorial visual identity (v2)
+ * AI分析师 Docs — editorial visual identity (v2)
  *
  * Docs site is intentionally distinct from the product app: warm-paper
  * background, editorial serif headings (Source Serif 4), indigo accent,
  * ruled dividers. Product app keeps its cool-gray dense Linear-style; docs
  * reads like a literary publication. Same split as Stripe, Cursor, Linear.
  *
- * Implementation: docs-scoped token override on top of Multica tokens
+ * Implementation: docs-scoped token override on top of AI分析师 tokens
  * (whose @theme inline references read --background / --foreground / etc
  * at runtime, so re-pointing the vars cascades through fumadocs's full
  * --color-fd-* bridge below).
  * ------------------------------------------------------------------------- */
 
 :root {
+  --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC",
+    sans-serif;
+  --font-serif: "Source Serif 4 Variable", "Source Serif 4", "Iowan Old Style",
+    "Apple Garamond", Baskerville, "Times New Roman", serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
   --fd-page-width: 1080px;
 }
 
@@ -37,7 +47,7 @@
   --card-foreground: oklch(0.182 0.012 50);
   --popover: oklch(0.99 0.002 85);
   --popover-foreground: oklch(0.182 0.012 50);
-  --primary: oklch(0.55 0.16 255);              /* Multica brand */
+  --primary: oklch(0.55 0.16 255);              /* AI分析师 brand */
   --primary-foreground: oklch(0.985 0.008 85);
   --secondary: oklch(0.945 0.012 85);
   --secondary-foreground: oklch(0.182 0.012 50);
@@ -63,7 +73,7 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Editorial palette — dark (warm dark, NOT Multica's cool dark)
+ * Editorial palette — dark (warm dark, NOT AI分析师's cool dark)
  * ------------------------------------------------------------------------- */
 
 .dark {
@@ -75,7 +85,7 @@
   --card-foreground: oklch(0.95 0.012 85);
   --popover: oklch(0.22 0.008 50);
   --popover-foreground: oklch(0.95 0.012 85);
-  --primary: oklch(0.7 0.15 255);               /* Multica brand — dark */
+  --primary: oklch(0.7 0.15 255);               /* AI分析师 brand — dark */
   --primary-foreground: oklch(0.18 0.008 50);
   --secondary: oklch(0.24 0.008 50);
   --secondary-foreground: oklch(0.95 0.012 85);
@@ -102,7 +112,7 @@
 /* ---------------------------------------------------------------------------
  * Fumadocs slot bridge
  *
- * Map fumadocs's --color-fd-* slots to our (now warm) Multica tokens.
+ * Map fumadocs's --color-fd-* slots to our (now warm) AI分析师 tokens.
  * @theme inline keeps the var() reference live so the cascade resolves
  * at runtime — same pattern tokens.css uses.
  * ------------------------------------------------------------------------- */
