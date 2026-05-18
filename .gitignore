@@ -47,6 +47,7 @@ apps/web/test-results/
 
 # feature tracking
 _features/
+.worktrees/
 
 # runtime
 *.pid
